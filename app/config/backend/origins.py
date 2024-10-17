@@ -1,5 +1,5 @@
 from app.utils.ip import local_ip
-from app.constants.clients import react_port, alt_react_port
+from app.config.backend.clients import react_port, alt_react_port
 
 # Orígenes autorizados
 allowed_origins = [

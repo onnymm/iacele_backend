@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.config.origins import allowed_origins
-from app.routes import odoo
+from app.config.backend.origins import allowed_origins
+from app.routes import odoo, sales
 from app.constants.routes import api_routes
 from app.constants.tags import tags
 
@@ -19,3 +19,4 @@ app.add_middleware(
 
 # Rutas a incluir
 app.include_router(odoo.router, prefix= api_routes.odoo, tags= [tags.odoo])
+app.include_router(sales.router, prefix= api_routes.odoo, tags= [tags.odoo])
