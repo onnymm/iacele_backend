@@ -43,7 +43,7 @@ class DataViewParameters(BaseModel):
         default= None
     )
 
-class CommisionsBaseData(BaseModel):
+class _CommisionsBaseData(BaseModel):
     invoice_line_id: int
     invoice_order_id: int
     name: str
@@ -70,6 +70,6 @@ class FieldsInfo(BaseModel):
     ttype: Literal["char", "float", "int", "date", "datetime", "selection", "monetary"]
 
 class ResponseCommissionsData(BaseModel):
-    data: list[CommisionsBaseData]
+    data: list[_CommisionsBaseData]
     fields: list[FieldsInfo]
     count: int
