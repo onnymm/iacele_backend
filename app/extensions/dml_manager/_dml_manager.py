@@ -558,6 +558,79 @@ class DMLManager():
         except KeyError:
             return []
 
+    def read(
+        self,
+        table_name: str,
+        ids: list[int],
+        fields: list[str] = [],
+        output_format: _OutputFormat = "DataFrame"
+    ) -> pd.DataFrame | dict[str, _CommonType]:
+        """
+        ## Lectura de registros
+        Este método retorna un DataFrame con el contenido de los registros de
+        una tabla de la base de datos a partir de una lista de IDs, en el orden
+        en el que se especificaron los campos o todos los campos en caso de no
+        haber sido especificados.
+
+        ### Los parámetros de entrada son:
+        - `table_name`: Nombre de la tabla de donde se tomarán los registros.
+        - `search_criteria`: Criterio de búsqueda para retornar únicamente los
+        resultados que cumplan con las condiciones provistas (Consultar
+        estructura más abajo).
+        - `fields`: Campos a mostrar. En caso de no ser especificado, se toman todos los
+        campos de la tabla de la base de datos.
+        - `offset`: Desfase de inicio de primer registro a mostrar.
+        - `limit`: Límite de registros retornados por la base de datos.
+
+        Uso:
+        >>> # Ejemplo 1
+        >>> db.search_read('users', [2])
+        >>> #    id    user          name         create_date          write_date
+        >>> # 0   2  onnymm  Onnymm Azzur 2024-11-04 11:16:59 2024-11-04 11:16:59
+        >>> 
+        >>> db.search_read('users', [2, 3])
+        >>> #    id    user          name         create_date          write_date
+        >>> # 0   2  onnymm  Onnymm Azzur 2024-11-04 11:16:59 2024-11-04 11:16:59
+        >>> # 1   3   lumii    Lumii Mynx 2024-11-04 11:16:59 2024-11-04 11:16:59
+        >>> 
+        >>> # Ejemplo 3
+        >>> db.search_read('users', [2, 3], ['user', 'create_date'])
+        >>> #    id         name         create_date
+        >>> # 0   2 Onnymm Azzur 2024-11-04 11:16:59
+        >>> # 1   3   Lumii Mynx 2024-11-04 11:16:59
+        """
+
+        # Obtención de la instancia de la tabla
+        table_instance = self._get_table_instance(table_name)
+
+        # Obtención de los campos de la tabla
+        table_fields = self._get_table_fields(table_instance, fields)
+
+        # Creación del query base
+        stmt = select(*table_fields)
+
+        # Creación del query where
+        where_query = self._where._build_where(table_instance, [('id', 'in', ids)])
+
+        # Conversión del query SQL
+        stmt = stmt.where(where_query)
+
+        # Ordenamiento de los datos
+        stmt = stmt.order_by(asc(table_instance.id))
+
+        # Conexión con la base de datos
+        with self._engine.connect() as conn:
+            # Obtención de los datos desde PostgreSQL
+            response = conn.execute(stmt)
+
+        # Inicialización del DataFrame de retorno
+        data = pd.DataFrame(response.fetchall())
+
+        if output_format == "dict":
+            return self._convert_to_dicts(data)
+
+        return data
+
     def search_read(
         self,
         table_name: str,
@@ -742,7 +815,7 @@ class DMLManager():
         return data
 
     def search_count(
-        cls,
+        self,
         table_name: str,
         search_criteria: CriteriaStructure = [],
     ) -> int:
@@ -828,7 +901,7 @@ class DMLManager():
         """
 
         # Obtención de la instancia de la tabla
-        table_instance = cls._get_table_instance(table_name)
+        table_instance = self._get_table_instance(table_name)
 
         stmt = (
             select( func.count() )
@@ -839,13 +912,13 @@ class DMLManager():
         if len(search_criteria) > 0:
 
             # Creación del query where
-            where_query = cls._where._build_where(table_instance, search_criteria)
+            where_query = self._where._build_where(table_instance, search_criteria)
 
             # Conversión del query SQL
             stmt = stmt.where(where_query)
 
         # Conexión con la base de datos
-        with cls._engine.connect() as conn:
+        with self._engine.connect() as conn:
             # Obtención de los datos desde PostgreSQL
             response = conn.execute(stmt)
 
