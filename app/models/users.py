@@ -20,4 +20,4 @@ class UserData(BaseUser):
     password: str
 
 class UserInDB(UserData, BaseRecord):
-    pass
+    id: int

@@ -1,7 +1,8 @@
-from fastapi import APIRouter, status, Query
+from fastapi import APIRouter, status, Query, Depends
 from odoo_api_manager import OdooAPIManager
 from app.models.odoo_models import ModelFields
 from app.utils.common import paginate, get_fields_info
+from app.security.auth import get_current_user, UserData
 
 # Manager para el API de Odoo
 odoo = OdooAPIManager()
@@ -13,7 +14,7 @@ router = APIRouter()
     "/model_fields",
     status_code= status.HTTP_200_OK
 )
-async def _get_model_fields(params: ModelFields = Query()):
+async def _get_model_fields(params: ModelFields = Query(), user: UserData = Depends(get_current_user)):
     """
     ## Consulta de campos de un modelo de Odoo
     Esta función muestra los campos del modelo de Odoo provisto, para poder ser

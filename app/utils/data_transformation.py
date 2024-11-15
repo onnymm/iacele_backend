@@ -30,3 +30,6 @@ def list_fields(info_fields: list[dict[str]]):
 
     # Retorno del diccionario
     return fields
+
+def remove_nonetypes(data: dict) -> dict:
+    return {key: data[key] for key in data if data[key] != None}
