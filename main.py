@@ -28,4 +28,4 @@ app.include_router(account.router, prefix= api_routes.account, tags= [tags.accou
 
 # Rutas a incluir
 app.include_router(odoo.router, prefix= api_routes.odoo, tags= [tags.odoo])
-app.include_router(sales.router, prefix= api_routes.odoo, tags= [tags.odoo])
+app.include_router(sales.router, prefix= api_routes.odoo, tags= [tags.sales])

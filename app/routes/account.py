@@ -7,7 +7,7 @@ from app.utils.data_transformation import remove_nonetypes
 router = APIRouter()
 
 @router.post(
-    "/",
+    "/register",
     status_code= status.HTTP_201_CREATED,
     name= "Registro",
 )
@@ -27,7 +27,7 @@ async def _register(user: UserData = Body()):
     return {"message": "Usuario creado con éxito"}
 
 @router.get(
-    "/",
+    "/me",
     status_code= status.HTTP_200_OK,
     name= "Mi cuenta"
 )
@@ -47,7 +47,7 @@ async def _get(user: UserInDB = Depends(get_current_user)):
     return data
 
 @router.patch(
-    "/",
+    "/me",
     status_code= status.HTTP_200_OK,
     name= "Modificar datos",
 )
@@ -67,7 +67,7 @@ async def _update(changes_data: UserNewData = Body(), user: UserInDB = Depends(g
     return True
 
 @router.delete(
-    "/",
+    "/me",
     status_code= status.HTTP_200_OK,
     name= "Eliminar cuenta",
 )
