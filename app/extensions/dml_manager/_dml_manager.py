@@ -12,7 +12,8 @@ from sqlalchemy import (
     or_,
     and_,
     asc,
-    func
+    desc,
+    func,
 )
 from sqlalchemy.orm import (
     DeclarativeBase
@@ -27,6 +28,7 @@ from ._types import (
     _OutputFormat,
     _ConnectionParams
 )
+from sqlalchemy.sql.selectable import Select
 
 # Tipos de dato
 _DatabaseConnection = Literal["real", "test"]
@@ -319,6 +321,12 @@ class DMLManager():
         'write_date',
     }
 
+    # Mapas de funciones:
+    _sorting_direction = {
+        True: asc,
+        False: desc,
+    }
+
     def __init__(
         self,
         config_file_name: str,
@@ -563,7 +571,9 @@ class DMLManager():
         table_name: str,
         ids: list[int],
         fields: list[str] = [],
-        output_format: _OutputFormat = "DataFrame"
+        sortby: str | list[str] = None,
+        ascending: bool | list[bool] = True,
+        output_format: _OutputFormat = "DataFrame",
     ) -> pd.DataFrame | dict[str, _CommonType]:
         """
         ## Lectura de registros
@@ -615,8 +625,13 @@ class DMLManager():
         # Conversión del query SQL
         stmt = stmt.where(where_query)
 
-        # Ordenamiento de los datos
-        stmt = stmt.order_by(asc(table_instance.id))
+        # Creación de parámetros de ordenamiento
+        stmt = self._build_sort(
+            stmt,
+            table_instance,
+            sortby,
+            ascending
+        )
 
         # Conexión con la base de datos
         with self._engine.connect() as conn:
@@ -638,6 +653,8 @@ class DMLManager():
         fields: list[str] = [],
         offset: int | None = None,
         limit: int | None = None,
+        sortby: str | list[str] = None,
+        ascending: bool | list[bool] = True,
         output_format: _OutputFormat = "DataFrame"
     ) -> pd.DataFrame | dict[str, _CommonType]:
         """
@@ -792,8 +809,13 @@ class DMLManager():
             # Conversión del query SQL
             stmt = stmt.where(where_query)
 
-        # Ordenamiento de los datos
-        stmt = stmt.order_by(asc(table_instance.id))
+        # Creación de parámetros de ordenamiento
+        stmt = self._build_sort(
+            stmt,
+            table_instance,
+            sortby,
+            ascending
+        )
 
         # Segmentación de inicio y fin en caso de haberlos
         if offset != None:
@@ -1027,6 +1049,67 @@ class DMLManager():
             conn.commit()
 
         return True
+
+    def _build_sort(
+        self,
+        stmt: Select,
+        table_instance: DeclarativeBase,
+        sortby: str | list[str],
+        ascending: str | list[bool] = True,
+    ) -> BinaryExpression:
+        """
+        ## Construcción de parámetros de ordenamiento
+        Este método interno construye los parámetros de ordenamiento por una o
+        más columnas de una tabla de manera ascendente o descendente.
+
+        Uso:
+        >>> # Ejemplo 1
+        >>> stmt = select(...)
+        >>> stmt = self._build_sort(stmt, table_instance, "col_1")
+        >>> # SELECT ... ORDER BY table.col_1 ASC
+        >>> 
+        >>> stmt = select(...)
+        >>> stmt = self._build_sort(stmt, table_instance, ["col_1", "col_2"], [True, False])
+        >>> # SELECT ... ORDER BY table.col_1 ASC, table.col_2 DESC
+        """
+
+        # Ordenamiento de los datos
+        if sortby is None:
+            # Ordenamiento ascendente por IDs
+            stmt = stmt.order_by(asc(table_instance.id))
+
+        else:
+            # Ordenamiento por una columna
+            if isinstance(sortby, str):
+                # Creación del query
+                stmt = stmt.order_by(
+                    # Obtención de función de ordenamiento
+                    self._sorting_direction[ascending](
+                        # Obtención del campo atributo de la tabla
+                        getattr(table_instance, sortby)
+                    )
+                )
+
+            # Ordenamiento por varias columnas
+            elif isinstance(sortby, list):
+                # Creación del query
+                stmt = stmt.order_by(
+                    # Destructuración en [*args] de una compreensión de lista
+                    *[
+                        # Obtención de función de ordenamiento
+                        self._sorting_direction[ascending_i](
+                            # Obtención del campo atributo de la tabla
+                            getattr(table_instance, sortby_i)
+                        )
+                        # Destructuración de la columna y dirección de ordenamiento del zip de listas
+                        for ( sortby_i, ascending_i ) in zip(
+                            sortby, ascending
+                        )
+                    ]
+                )
+
+        # Retorno de la expresión binaria
+        return stmt
 
     def _get_table_fields(
             self, table_instance: DeclarativeBase,
