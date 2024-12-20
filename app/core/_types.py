@@ -1,4 +1,6 @@
 from typing import Literal, Union
+from typing import TypedDict, Callable
+import pandas as pd
 
 # Operadores de comparación para queries SQL
 _ComparisonOperator = Literal['=', '!=', '>', '>=', '<', '<=', '><', 'in', 'not in', 'ilike', 'not ilike']
@@ -62,4 +64,13 @@ Los operadores lógicos disponibles son:
 - `'|'`: OR
 """
 
+# Valor de criterio de búsqueda
 _CommonType = Union[str, int, float, list[int]]
+
+# Función de transformación de datos de pandas.DataFrame
+class DataTransformationCallback(TypedDict):
+    search_criteria: CriteriaStructure
+    callback: Callable[[pd.DataFrame], list[dict]]
+
+# Mapa de funciones de transformación de datos de pandas.DataFrame
+TransformCallbacksCollection = dict[str, DataTransformationCallback]

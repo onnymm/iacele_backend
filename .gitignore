@@ -124,6 +124,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+_env/
 env/
 venv/
 ENV/
@@ -162,6 +163,9 @@ cython_debug/
 #.idea/
 
 app/data/
+
+# Archivo de configuración de base de datos
+db_config.json
 
 # Pruebas en Jupyter Notebooks
 **.ipynb
