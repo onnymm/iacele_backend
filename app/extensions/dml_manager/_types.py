@@ -1,7 +1,9 @@
-from typing import Literal, Union, TypedDict
+from typing import Literal, Union, TypedDict, Callable
+from app.database.models._types import DeclarativeBase
+from sqlalchemy.sql.elements import BinaryExpression
 
 # Operadores de comparación para queries SQL
-_ComparisonOperator = Literal['=', '!=', '>', '>=', '<', '<=', '><', 'in', 'not in', 'ilike', 'not ilike']
+_ComparisonOperator = Literal['=', '!=', '>', '>=', '<', '<=', '><', 'in', 'not in', 'ilike', 'not ilike', '~', '~*']
 # Operadores lógicos para queries SQL
 _LogicOperator = Literal['&', '|']
 # Tipo de dato de valor para queries SQL
@@ -9,8 +11,9 @@ _TripletValue = Union[
     int,
     float,
     str,
-    list[int, str]
+    list[int]
 ]
+# _CommonType = Union[str, int, float, list[int]]
 # Estructura de tripletas para queries SQL
 _TripletStructure = tuple[str, _ComparisonOperator, _TripletValue]
 # Estructura de criterios de búsqueda para queries SQL
@@ -62,14 +65,17 @@ Los operadores lógicos disponibles son:
 - `'|'`: OR
 """
 
-_CommonType = Union[str, int, float, list[int]]
-_OutputFormat = Literal["DataFrame", "dict"]
+# Función de operador
+OperatorCallback = Callable[[DeclarativeBase, str, _TripletValue], BinaryExpression]
+
+# Formato de salida
+OutputFormat = Literal["DataFrame", "dict"]
 
 class _TablesMap(TypedDict):
     table_name: str
     table_instance: str
 
-class _ConnectionParams(TypedDict):
+class ConnectionParams(TypedDict):
     """
     ## Parámetros de conexión a PostgreSQL
     Estructura:

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import os
 import json
 import importlib
@@ -11,6 +12,7 @@ from sqlalchemy import (
     delete,
     or_,
     and_,
+    not_,
     asc,
     desc,
     func,
@@ -21,17 +23,26 @@ from sqlalchemy.orm import (
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from ._types import (
+    _ComparisonOperator,
     CriteriaStructure,
     _TripletStructure,
     _LogicOperator,
-    _CommonType,
-    _OutputFormat,
-    _ConnectionParams
+    _TripletValue,
+    OutputFormat as _OutputFormat,
+    ConnectionParams as _ConnectionParams,
+    OperatorCallback,
 )
 from sqlalchemy.sql.selectable import Select
 
 # Tipos de dato
 _DatabaseConnection = Literal["real", "test"]
+
+def get_table_field(table: DeclarativeBase, field: str) -> InstrumentedAttribute:
+    """
+    Obtención del campo de una tabla.
+    """
+    # Extracción del atributo de la tabla
+    return getattr(table, field)
 
 class DMLManager():
     """
@@ -281,6 +292,8 @@ class DMLManager():
     - `'not in'`: No está en
     - `'ilike'`: Contiene
     - `'not ilike'`: No contiene
+    - `'~'`: Coincide con expresión regular (sensible a mayúsculas y minúsculas)
+    - `'~*'`: Coincide con expresión regular (no sensible a mayúsculas y minúsculas)
 
     Estas tuplas deben contenerse en una lista. En caso de haber más de una condición, se deben
     Unir por operadores lógicos `'AND'` u `'OR'`. Siendo el operador lógico el que toma la
@@ -471,6 +484,8 @@ class DMLManager():
         - `'not in'`: No está en
         - `'ilike'`: Contiene
         - `'not ilike'`: No contiene
+        - `'~'`: Coincide con expresión regular (sensible a mayúsculas y minúsculas)
+        - `'~*'`: Coincide con expresión regular (no sensible a mayúsculas y minúsculas)
 
         Estas tuplas deben contenerse en una lista. En caso de haber más de una condición, se deben
         Unir por operadores lógicos `'AND'` u `'OR'`. Siendo el operador lógico el que toma la
@@ -574,7 +589,7 @@ class DMLManager():
         sortby: str | list[str] = None,
         ascending: bool | list[bool] = True,
         output_format: _OutputFormat = "DataFrame",
-    ) -> pd.DataFrame | dict[str, _CommonType]:
+    ) -> pd.DataFrame | dict[str, _TripletValue]:
         """
         ## Lectura de registros
         Este método retorna un DataFrame con el contenido de los registros de
@@ -656,7 +671,7 @@ class DMLManager():
         sortby: str | list[str] = None,
         ascending: bool | list[bool] = True,
         output_format: _OutputFormat = "DataFrame"
-    ) -> pd.DataFrame | dict[str, _CommonType]:
+    ) -> pd.DataFrame | dict[str, _TripletValue]:
         """
         ## Búsqueda y lectura de registros
         Este método retorna un DataFrame con el contenido de los registros de una
@@ -718,6 +733,8 @@ class DMLManager():
         - `'not in'`: No está en
         - `'ilike'`: Contiene
         - `'not ilike'`: No contiene
+        - `'~'`: Coincide con expresión regular (sensible a mayúsculas y minúsculas)
+        - `'~*'`: Coincide con expresión regular (no sensible a mayúsculas y minúsculas)
 
         Estas tuplas deben contenerse en una lista. En caso de haber más de una condición, se deben
         Unir por operadores lógicos `'AND'` u `'OR'`. Siendo el operador lógico el que toma la
@@ -889,6 +906,8 @@ class DMLManager():
         - `'not in'`: No está en
         - `'ilike'`: Contiene
         - `'not ilike'`: No contiene
+        - `'~'`: Coincide con expresión regular (sensible a mayúsculas y minúsculas)
+        - `'~*'`: Coincide con expresión regular (no sensible a mayúsculas y minúsculas)
 
         Estas tuplas deben contenerse en una lista. En caso de haber más de una condición, se deben
         Unir por operadores lógicos `'AND'` u `'OR'`. Siendo el operador lógico el que toma la
@@ -951,7 +970,7 @@ class DMLManager():
         self,
         table_name: str,
         record_ids: int | list[int],
-        data: dict[str, _CommonType],
+        data: dict[str, _TripletValue],
     ) -> bool:
         """
         ## Actualización de registros
@@ -1314,7 +1333,7 @@ class DMLManager():
         # Retorno del motor de conexión
         return engine
 
-    def _convert_to_dicts(self, data: pd.DataFrame) -> list[dict[str, _CommonType]]:
+    def _convert_to_dicts(self, data: pd.DataFrame) -> list[dict[str, _TripletValue]]:
         """
         ## Conversión de resultados a lista de diccionarios
         Este método interno convierte un DataFrame a lista de diccionarios. Si
@@ -1327,11 +1346,82 @@ class DMLManager():
         return (
             list(
                 data
+                .replace({np.nan: None})
                 .T
                 .to_dict()
                 .values()
             )
         )
+
+    @classmethod
+    def and_(cls, cs_1: CriteriaStructure, cs_2: CriteriaStructure) -> CriteriaStructure:
+        """
+        ## Método de clase para unir dos criterios de búsqueda por medio de un operador `'&'`.
+
+        Uso:
+        >>> # Ejemplo 1
+        >>> cs_1 = [('invoice_line_id', '=', 5)]
+        >>> cs_2 = [('state', '=', 'sent')]
+        >>> merged_cs = DMLManager.and_(cs_1, cs_2)
+        >>> # ['&', ('invoice_line_id', '=', 5), ('state', '=', 'sent')]
+        >>> 
+        >>> # Ejemplo 2
+        >>> cs_1 = [('invoice_line_id', '=', 5)]
+        >>> cs_2 = ['|', ('state', '=', 'posted'), ('state', '=', 'sent')]
+        >>> merged_cs = DMLManager.and_(cs_1, cs_2)
+        >>> # ['&', ('invoice_line_id', '=', 5), '|', ('state', '=', 'posted'), ('state', '=', 'sent')]
+        """
+
+        # Si los dos criterios de búsqueda contienen datos
+        if len(cs_1) and len(cs_2):
+
+            # Se retornan los criterios de búsqueda unidos por operador `and`
+            res: CriteriaStructure = ['&', *cs_1, *cs_2]
+            return res
+
+        # Si sólo el primer criterio de búsqueda contiene datos...
+        elif len(cs_1):
+            # Se retorna sólo el primer criterio de búsqueda
+            return cs_1
+
+        # Si el segundo criterio de búsqueda contiene o no datos, se retorna éste
+        else:
+            return cs_2
+
+    @classmethod
+    def or_(cls, cs_1: CriteriaStructure, cs_2: CriteriaStructure) -> CriteriaStructure:
+        """
+        ## Método de clase para unir dos criterios de búsqueda por medio de un operador `'|'`.
+
+        Uso:
+        >>> # Ejemplo 1
+        >>> cs_1 = [('invoice_line_id', '=', 5)]
+        >>> cs_2 = [('state', '=', 'sent')]
+        >>> merged_cs = DMLManager.or_(cs_1, cs_2)
+        >>> # ['|', ('invoice_line_id', '=', 5), ('state', '=', 'sent')]
+        >>> 
+        >>> # Ejemplo 2
+        >>> cs_1 = [('invoice_line_id', '=', 5)]
+        >>> cs_2 = ['|', ('state', '=', 'posted'), ('state', '=', 'sent')]
+        >>> merged_cs = DMLManager.or_(cs_1, cs_2)
+        >>> # ['|', ('invoice_line_id', '=', 5), '|', ('state', '=', 'posted'), ('state', '=', 'sent')]
+        """
+
+        # Si los dos criterios de búsqueda contienen datos
+        if len(cs_1) and len(cs_2):
+
+            # Se retornan los criterios de búsqueda unidos por operador `or`
+            res: CriteriaStructure = ['|', *cs_1, *cs_2]
+            return res
+
+        # Si sólo el primer criterio de búsqueda contiene datos...
+        elif len(cs_1):
+            # Se retorna sólo el primer criterio de búsqueda
+            return cs_1
+
+        # Si el segundo criterio de búsqueda contiene o no datos, se retorna éste
+        else:
+            return cs_2
 
     class _where():
         """
@@ -1363,6 +1453,8 @@ class DMLManager():
         - `'not in'`: No está en
         - `'ilike'`: Contiene
         - `'not ilike'`: No contiene
+        - `'~'`: Coincide con expresión regular (sensible a mayúsculas y minúsculas)
+        - `'~*'`: Coincide con expresión regular (no sensible a mayúsculas y minúsculas)
 
         Los operadores lógicos disponibles son:
         - `'&'`: AND
@@ -1370,18 +1462,20 @@ class DMLManager():
         """
 
         # Operaciones de comparación
-        _comparison_operation = {
-            '=': lambda table, field, value: getattr(table, field) == value,
-            '!=': lambda table, field, value: getattr(table, field) != value,
-            '>': lambda table, field, value: getattr(table, field) > value,
-            '>=': lambda table, field, value: getattr(table, field) >= value,
-            '<': lambda table, field, value: getattr(table, field) < value,
-            '<=': lambda table, field, value: getattr(table, field) <= value,
-            '><': lambda table, field, value: getattr(table, field).between(value[0], value[1]),
-            'in': lambda table, field, value: getattr(table, field).in_(value),
-            'not in': lambda table, field, value: getattr(table, field).not_in(value),
-            'ilike': lambda table, field, value: getattr(table, field).ilike(value),
-            'not ilike': lambda table, field, value: getattr(table, field).notilike(value),
+        _comparison_operation: dict[_ComparisonOperator, OperatorCallback] = {
+            '=': lambda table, field, value: get_table_field(table, field) == value,
+            '!=': lambda table, field, value: get_table_field(table, field) != value,
+            '>': lambda table, field, value: get_table_field(table, field) > value,
+            '>=': lambda table, field, value: get_table_field(table, field) >= value,
+            '<': lambda table, field, value: get_table_field(table, field) < value,
+            '<=': lambda table, field, value: get_table_field(table, field) <= value,
+            '><': lambda table, field, value: get_table_field(table, field).between(value[0], value[1]),
+            'in': lambda table, field, value: get_table_field(table, field).in_(value),
+            'not in': lambda table, field, value: get_table_field(table, field).not_in(value),
+            'ilike': lambda table, field, value: get_table_field(table, field).contains(value),
+            'not ilike': lambda table, field, value: not_(get_table_field(table, field).contains(value)),
+            '~': lambda table, field, value: get_table_field(table, field).regexp_match(value),
+            '~*': lambda table, field, value: get_table_field(table, field).regexp_match(value, 'i'),
         }
         """
         ## Operación de comparación
@@ -1410,6 +1504,8 @@ class DMLManager():
         - `'not in'`: No está en
         - `'ilike'`: Contiene
         - `'not ilike'`: No contiene
+        - `'~'`: Coincide con expresión regular (sensible a mayúsculas y minúsculas)
+        - `'~*'`: Coincide con expresión regular (no sensible a mayúsculas y minúsculas)
         """
 
         # Operaciones lógicas
@@ -1473,6 +1569,8 @@ class DMLManager():
             - `'not in'`: No está en
             - `'ilike'`: Contiene
             - `'not ilike'`: No contiene
+            - `'~'`: Coincide con expresión regular (sensible a mayúsculas y minúsculas)
+            - `'~*'`: Coincide con expresión regular (no sensible a mayúsculas y minúsculas)
 
             Los operadores lógicos disponibles son:
             - `'&'`: AND
@@ -1520,7 +1618,7 @@ class DMLManager():
                             cls._create_individual_query(table, search_criteria[i + 1]),
                             # Se ejecuta esta función recursivamente para la evaluación del resto
                             #   de los valores del criterio de búsqueda
-                            cls.build_where(table, search_criteria[i + 2:])
+                            cls._build_where(table, search_criteria[i + 2:])
                         )
 
                     # Si el segundo de los dos siguientes valores es tripleta
@@ -1598,6 +1696,8 @@ class DMLManager():
             - `'not in'`: No está en
             - `'ilike'`: Contiene
             - `'not ilike'`: No contiene
+            - `'~'`: Coincide con expresión regular (sensible a mayúsculas y minúsculas)
+            - `'~*'`: Coincide con expresión regular (no sensible a mayúsculas y minúsculas)
             """
             # Destructuración de valores
             ( field, op, value ) = fragment
