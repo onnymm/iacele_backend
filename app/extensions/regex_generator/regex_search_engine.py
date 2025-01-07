@@ -33,7 +33,7 @@ class RegexSearchEngine():
         "$": [_escaped, _indeterminate, _one_missed],
         "\"": [_escaped, _indeterminate, _one_missed],
         " ": [_indeterminate, _many_missed],
-        "0123456789": [_exact]
+        "0123456789": [_exact],
     }
 
     # Comportamiento por defecto para el resto de caracteres

@@ -1,3 +1,5 @@
+from app.types.types import SearchOP
+
 odoo = {
     'warehouse': {
 
@@ -17,4 +19,11 @@ odoo = {
             30,
         ],
     },
+}
+
+# Operadores para criterio de búsqueda de texto
+op: SearchOP = {
+    're': '~*',
+    'contains': 'ilike',
+    'match': '=',
 }

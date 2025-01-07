@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Literal
 from datetime import date
+from app.types.types import DataRecords, FieldData
 
 class DataViewParameters(BaseModel):
     """
@@ -73,3 +74,35 @@ class ResponseCommissionsData(BaseModel):
     data: list[_CommisionsBaseData]
     fields: list[FieldsInfo]
     count: int
+
+class DataViewResponse(BaseModel):
+    data: DataRecords
+    count: int
+    fields: list[FieldData]
+
+    model_config = {
+        'json_schema_extra': {
+            'examples': [
+                {
+                    "data": [
+                        {
+                        "id": 0,
+                        "name": "some name",
+                        "value": 50,
+                        }
+                    ],
+                    "count": 150,
+                    "fields": [
+                        {
+                            "name": "name",
+                            "ttype": "char"
+                        },
+                        {
+                            "name": "value",
+                            "ttype": "integer"
+                        },
+                    ]
+                },
+            ]
+        }
+    }

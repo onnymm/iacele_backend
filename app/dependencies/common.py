@@ -59,11 +59,9 @@ def criteria_from_endpoint(search_criteria: str = Query("[]")):
     - `'&'`: AND
     - `'|'`: OR
     """
-    print(search_criteria)
 
     # Conversión del criterio de búsqueda de cadena de texto a lista de tuplas
     search_criteria: CriteriaStructure = json.loads(search_criteria)
-
 
     # Función de retorno
     def build_criteria(base_criteria: CriteriaStructure = []):
