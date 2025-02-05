@@ -1,6 +1,6 @@
 from app.database import db_connection
 import pandas as pd
-from app.core._types import TransformCallbacksCollection
+from app.core.types import TransformCallbacksCollection
 
 def get_stats(user_id: int):
 
