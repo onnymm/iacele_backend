@@ -51,11 +51,11 @@ def _get_user(username) -> UserInDB | bool:
 
     # Intento de obtención de usuario
     try:
-        [ user ] = db_connection.search_read("users", [('user', '=', username)], output_format= "dict")
+        [ user ] = db_connection.search_read("users", ['&', ('user', '=', username), ('active', '=', True)], output_format= "dict")
 
     # Ausencia de usuario
     except ValueError:
-        return False
+        return None
 
     # Retorno del usuario
     return UserInDB(**user)
