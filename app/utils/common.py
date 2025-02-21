@@ -1,5 +1,5 @@
 from typing import Tuple
-from app.core.odoo_manager import odoo, odoo_models
+from app import odoo
 import pandas as pd
 
 def paginate(page: int, items_per_page: int) -> Tuple[int, int]:

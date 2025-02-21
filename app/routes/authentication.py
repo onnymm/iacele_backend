@@ -2,13 +2,17 @@ from fastapi import APIRouter, status, Depends
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
+from app.constants.tags import tags
 from app.security.auth import (
     authenticate_user,
     create_access_token,
     Token,
 )
 
-router = APIRouter()
+router = APIRouter(
+    prefix= '/token',
+    tags= [tags.authentication]
+)
 
 @router.post("/", name= "Obtención de token")
 async def login_for_access_token(

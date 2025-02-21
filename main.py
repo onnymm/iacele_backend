@@ -1,13 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.config.backend.origins import allowed_origins
-from app.constants.routes import api_routes
-from app.constants.tags import tags
+from app.core.server import allowed_origins
 from app.routes import (
     account,
     authentication,
-    odoo,
     sales,
+    tasks,
 )
 
 # App del servidor 
@@ -23,9 +21,11 @@ app.add_middleware(
 )
 
 # Rutas de estructura base de la aplicación
-app.include_router(authentication.router, prefix= api_routes.authentication, tags= [tags.authentication])
-app.include_router(account.router, prefix= api_routes.account, tags= [tags.account])
+app.include_router(authentication.router)
 
-# Rutas a incluir
-app.include_router(odoo.router, prefix= api_routes.odoo, tags= [tags.odoo])
-app.include_router(sales.router, prefix= api_routes.odoo, tags= [tags.sales])
+# Usable por el frontend
+app.include_router(account.router)
+app.include_router(sales.router)
+
+# Tareas
+app.include_router(tasks.router)

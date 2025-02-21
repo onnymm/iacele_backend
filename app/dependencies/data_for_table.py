@@ -1,5 +1,5 @@
 import json
-from app.core._types import CriteriaStructure
+from app.core.types import CriteriaStructure
 from app.models.base import BaseDataRequest
 from app.database import db_connection
 from app.database.types import types

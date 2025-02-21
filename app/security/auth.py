@@ -6,10 +6,10 @@ from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from typing import Annotated, Union
+from typing import Annotated
 from datetime import datetime, timedelta
+from app import settings
 from app.database import db_connection
-from app.config import config
 from app.models import UserData, UserInDB
 
 class Token(BaseModel):
@@ -23,7 +23,7 @@ class _TokenData(BaseModel):
     username: str
 
 # Expiración de token
-_expire_days = config['login']['token_expire_days']
+_expire_days = settings.auth.TOKEN_EXPIRE_DAYS
 
 # Clave de encriptación
 _KEY = os.environ.get("CRYPT_KEY")
@@ -51,7 +51,7 @@ def _get_user(username) -> UserInDB | bool:
 
     # Intento de obtención de usuario
     try:
-        [ user ] = db_connection.search_read("users", ['&', ('user', '=', username), ('active', '=', True)], output_format= "dict")
+        [ user ] = db_connection.search_read('base.users', ['&', ('user', '=', username), ('active', '=', True)], output_format= "dict")
 
     # Ausencia de usuario
     except ValueError:

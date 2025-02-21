@@ -1,5 +1,5 @@
 from fastapi import Query
-from app.core._types import CriteriaStructure
+from app.core.types import CriteriaStructure
 import json
 
 def criteria_from_endpoint(search_criteria: str = Query("[]")):
