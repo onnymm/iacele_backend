@@ -4,6 +4,7 @@ from app.core.server import allowed_origins
 from app.routes import (
     account,
     authentication,
+    crud,
     sales,
     tasks,
 )
@@ -26,6 +27,9 @@ app.include_router(authentication.router)
 # Usable por el frontend
 app.include_router(account.router)
 app.include_router(sales.router)
+
+# Ruta para transacciones de datos comunes
+app.include_router(crud.router)
 
 # Tareas
 app.include_router(tasks.router)
