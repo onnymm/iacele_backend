@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status, Body
-from app import db_connection
 from app.security import get_current_user
+from app.core.api import data_for_table
 from app.constants import (
     tags,
 )
@@ -8,7 +8,6 @@ from app.models import (
     BaseDataRequest,
     UserInDB,
 )
-from dml_manager import DMLManager, CriteriaStructure
 
 router = APIRouter(
     prefix= '/sales',
@@ -84,36 +83,3 @@ async def _commissions(
         view_params,
         [('salesperson_id', '=', user.odoo_id)]
     )
-
-def data_for_table(
-    table_name: str,
-    view_params: BaseDataRequest,
-    base_criteria: CriteriaStructure = [],
-) -> list[dict]:
-
-    # Creación del criterio de búsqueda completo
-    search_criteria = DMLManager.and_(
-        view_params.search_criteria,
-        base_criteria
-    )
-
-    data = db_connection.search_read(
-        table_name,
-        search_criteria,
-        # fields= ['id'],
-        offset= view_params.items_per_page * view_params.page,
-        limit= view_params.items_per_page,
-        sortby= view_params.sortby,
-        ascending= view_params.ascending,
-        output_format= 'dict',
-    )
-
-    count = db_connection.search_count(
-        table_name,
-        search_criteria,
-    )
-
-    return {
-        'data': data,
-        'count': count,
-    }
