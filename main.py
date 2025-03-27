@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.middlewares import CamelCaseMiddleware
 from app.core.server import allowed_origins
 from app.routes import (
     account,
@@ -20,6 +21,7 @@ app.add_middleware(
     allow_methods= ["*"],
     allow_headers= ["*"],
 )
+app.add_middleware(CamelCaseMiddleware)
 
 # Rutas de estructura base de la aplicación
 app.include_router(authentication.router)
