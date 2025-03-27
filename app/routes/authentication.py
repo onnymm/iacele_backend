@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, Depends
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
+from app.constants.api_messages import ErrorMessage
 from app.constants.tags import tags
 from app.security.auth import (
     authenticate_user,
@@ -30,7 +31,7 @@ async def login_for_access_token(
     if not user:
         raise HTTPException(
             status_code= status.HTTP_401_UNAUTHORIZED,
-            detail= "Nombre de usuario o contraseña incorrectos",
+            detail= ErrorMessage.AUTHENTICATION,
             headers= {"WWW-Authenticate": "Bearer"}
         )
 
