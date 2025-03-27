@@ -3,71 +3,13 @@ from fastapi.exceptions import HTTPException
 from app.constants.tags import tags
 from app.security.auth import hash_password, get_current_user, authenticate_user
 from app.database import db_connection
-from app.models.users import UserNewData, UserData, UserInDB, ChangePassword, NewUserTemplate, AlreadyRegistered
+from app.models.users import UserNewData, UserInDB, ChangePassword
 from app.utils.data_transformation import remove_nonetypes
-from app import odoo
 
 router = APIRouter(
     prefix= '/account',
     tags= [tags.account],
 )
-
-# @router.post(
-#     '/register',
-#     status_code= status.HTTP_201_CREATED,
-#     name= 'Registro',
-#     response_model= bool,
-#     response_description= 'Registro exitoso',
-#     responses= {
-#         409: {
-#             'model': AlreadyRegistered
-#         }
-#     }
-# )
-# async def _register(data: NewUserTemplate, _: UserInDB = Depends(get_current_user)):
-#     """
-#     ## Registro de nuevo usuario
-#     Este endpoint realiza el registro de un nuevo usuario en la aplicación. Si
-#     el usuario ya existe en la base de datos de iaCele, se retorna un error 409.
-#     La creación del usuario registra en la base de datos los siguientes
-#     valores:
-#     - `name`: Nombre del usuario en Odoo.
-#     - `user`: Nombre del correo electrónico del usuario en Odoo, antes del `@`.
-#     - `odoo_id`: La ID del usuario de Odoo.
-#     - `password`: La contraseña genérica configurada en los ajustes del
-#     servidor backend.
-#     - `active`: Estatus del usuario. Por defecto se establece a `True`.
-
-#     ### Parámetros
-#     - `odoo_id`: ID de registro en el modelo `res.users` en Odoo.
-#     """
-
-#     if db_connection.search_read('users', [('odoo_id', '=', data.odoo_id)]):
-#         raise HTTPException(
-#             status_code= status.HTTP_409_CONFLICT,
-#             detail= 'El usuario ya existe en la base de datos de iaCele.'
-#         )
-
-#     else:
-#         # Obtención de la información desde Odoo
-#         name, email = odoo.get_values('res.users', data.odoo_id, ['name', 'login'])
-
-#         # Obtención del usuario
-#         user = email.split("@")[0]
-
-#         # Construcción del registro del registro
-#         record = {
-#             'user': user,
-#             'name': name,
-#             'odoo_id': data.odoo_id,
-#             'password': hash_password('123456')
-#         }
-
-#         # Creación del registro en la base de datos
-#         db_connection.create('users', record)
-
-#         # Retorno de respuesta si la modificación se realizó con éxito
-#         return True
 
 @router.get(
     "/me",
