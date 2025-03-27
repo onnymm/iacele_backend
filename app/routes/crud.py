@@ -1,13 +1,14 @@
 from fastapi import (
-    Body,
     Depends,
-    Query,
     APIRouter,
     status,
 )
-from app.models import UserInDB
+from app.models import (
+    UserInDB,
+    crud,
+    response,
+)
 from app.security import get_current_user
-from app.types import DBTable
 from app import db_connection
 
 # Creación del ruteador
@@ -22,31 +23,130 @@ router = APIRouter(
     status_code= status.HTTP_200_OK,
 )
 def _read(
-    user: UserInDB = Depends(get_current_user),
-    table_name: DBTable = Query(),
-    record_ids: int | list[int] = Query(),
-    fields: list[str] = Query([])
-):
+    params: crud.read,
+    _: UserInDB = Depends(get_current_user),
+) -> response.records:
     """
     ## Lectura de registros
-    Este endpoint retorna la información de uno o más registros de una tabla
-    en la base de datos.
+    Este endpoint permite la lectura de uno o más registros de una tabla en la
+    base de datos.
 
     ### Los parámetros de entrada son:
-    - `table_name`: Nombre de la tabla de donde se tomarán los registros.
-    - `record_ids`: IDs de los respectivos registros a leer.
+    - `tableName`: Nombre de la tabla de donde se tomarán los registros.
+    - `recordIds`: IDs de los respectivos registros a leer.
     - `fields`: Campos a mostrar. En caso de no ser especificado, se toman todos los
-    campos de la tabla de la base de datos.
-    - `offset`: Desfase de inicio de primer registro a mostrar.
-    - `limit`: Límite de registros retornados por la base de datos.
+    campos de la tabla de la base de datos (opcional).
+    - `offset`: Desfase de inicio de primer registro a mostrar (opcional).
+    - `limit`: Límite de registros retornados por la base de datos (opcional).
     """
 
-    return db_connection.read(
-        table_name,
-        record_ids,
-        fields,
+    # Lectura de registros
+    data = db_connection.read(
+        params.table_name,
+        params.record_ids,
+        params.fields,
+        params.sortby,
+        params.ascending,
         output_format= 'dict'
     )
+
+    # Retorno de información
+    return data
+
+@router.post(
+    '/search_read',
+    name= 'Búsqueda de registros',
+    status_code= status.HTTP_200_OK,
+)
+def _search_read(
+    params: crud.search_read,
+    _: UserInDB = Depends(get_current_user),
+) -> response.search_read:
+    """
+    ## Búsqueda y visualización de registros
+    Este endpoint permite la búsqueda y visualización de registros en una tabla
+    de la base de datos.
+
+    ### Parámetros de entrada
+    - `tableName`: Nombre de la tabla en la base de datos.
+    - `searchCriteria`: Criterio de búsqueda (opcional).
+    - `fields`: Campos específicos a visualizar en los resultados arrojados
+    (opcional).
+    - `offset`: Desfase de índice de registros a visualizar (opcional).
+    - `limit`: Cantidad máxima de registros a visualizar (opcional).
+    - `sortby`: Campo o campos como criterio de ordenamiento de registros
+    (opcional).
+    - `ascending`: Dirección de ordenamiento ascendente (opcional).
+
+    ### Estructura de criterio de búsqueda
+    La estructura del criterio de búsqueda consiste en una lista de tuplas de 3 valores, mejor
+    conocidas como tripletas. Cada una de estas tripletas consiste en 3 diferentes parámetros:
+    1. Nombre del campo de la tabla
+    2. Operador de comparación
+    3. Valor de comparación
+
+    Algunos ejemplos de tripletas son:
+    ```py
+    ('id', '=', 5)
+    # ID es igual a 5
+    ('amount', '>', 500)
+    # "amount" es mayor a 500
+    ('name', 'ilike', 'as')
+    # "name" contiene "as"
+    ```
+
+    Los operadores de comparación disponibles son:
+    - `'='`: Igual a
+    - `'!='`: Diferente de
+    - `'>'`: Mayor a
+    - `'>='`: Mayor o igual a
+    - `'<`': Menor que
+    - `'<='`: Menor o igual que
+    - `'><'`: Entre
+    - `'in'`: Está en
+    - `'not in'`: No está en
+    - `'ilike'`: Contiene
+    - `'not ilike'`: No contiene
+    - `'~'`: Coincide con expresión regular (sensible a mayúsculas y minúsculas)
+    - `'~*'`: Coincide con expresión regular (no sensible a mayúsculas y minúsculas)
+
+    Estas tuplas deben contenerse en una lista. En caso de haber más de una condición, se deben
+    Unir por operadores lógicos `'AND'` u `'OR'`. Siendo el operador lógico el que toma la
+    primera posición:
+    ```py
+    ['&', ('amount', '>', 500), ('name', 'ilike', 'as')]
+    # "amount" es mayor a 500 y "name" contiene "as"
+    ['|', ('id', '=', 5), ('state', '=', 'posted')]
+    # "id" es igual a 5 o "state" es igual a "posted"
+    ```
+
+    Los operadores lógicos disponibles son:
+    - `'&'`: AND
+    - `'|'`: OR
+    """
+
+    # Búsqueda y lectura de los registros
+    data = db_connection.search_read(
+        params.table_name,
+        params.search_criteria,
+        params.fields,
+        params.offset,
+        params.limit,
+        params.sortby,
+        params.ascending,
+    )
+
+    # Conteo de resultados
+    count = db_connection.search_count(
+        params.table_name,
+        params.search_criteria,
+    )
+
+    # Retorno de la información
+    return {
+        'data': data,
+        'count': count,
+    }
 
 @router.patch(
     '/update',
@@ -54,10 +154,8 @@ def _read(
     status_code= status.HTTP_200_OK,
 )
 def _update(
-    user: UserInDB = Depends(get_current_user),
-    record_id: int = Body(),
-    table_name: DBTable = Body(),
-    data_to_write: dict = Body()
+    params: crud.update,
+    _: UserInDB = Depends(get_current_user),
 ) -> bool:
     """
     ## Actualización de registros
@@ -67,16 +165,16 @@ def _update(
     todos los registros provistos.
 
     ### Los parámetros de entrada son:
-    - `table_name`: Nombre de la tabla en donde se harán los cambios
-    - `record_ids`: ID o lista de IDs a actualizar
+    - `tableName`: Nombre de la tabla en donde se harán los cambios
+    - `recordIds`: ID o lista de IDs a actualizar
     - `data`: Diccionario de valores a modificar masivamente
     """
 
     # Actualización en la base de datos
     db_connection.update(
-        table_name,
-        record_id,
-        data_to_write,
+        params.table_name,
+        params.record_id,
+        params.data_to_write,
     )
 
     return True
