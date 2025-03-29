@@ -1,72 +1,80 @@
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 import json
-import re
-
-# Función para convertir camelCase a snake_case
-def _camel_to_snake(name: str) -> str:
-    return re.sub(r'([A-Z])', r'_\1', name).lower()
-
-# Función para convertir snake_case a camelCase
-def _snake_to_camel(name: str) -> str:
-    return re.sub(r'_([a-z])', lambda x: x.group(1).upper(), name)
-
-def _convert_keys_to_snake_case(data):
-    if isinstance(data, dict):
-        return { _camel_to_snake(key): _convert_keys_to_snake_case(value) for ( key, value ) in data.items() }
-    elif isinstance(data, list):
-        return [ _convert_keys_to_snake_case(i) for i in data ]
-    return data
-
-def _convert_keys_to_camel_case(data):
-    if isinstance(data, dict):
-        return { _snake_to_camel(key): _convert_keys_to_camel_case(value) for ( key, value ) in data.items() }
-    elif isinstance(data, list):
-        return [ _convert_keys_to_camel_case(i) for i in data ]
-    return data
+from app.utils.middlewares import (
+    convert_keys_to_snake_case,
+    convert_keys_to_camel_case,
+    is_json_like,
+    is_open_api_response,
+    is_token_provition,
+)
 
 class CamelCaseMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Si la petición tiene JSON, convertir a snake_case
+        # Si la petición tiene JSON se convierte a snake_case
         if request.headers.get("content-type") == "application/json":
+            # Obtención del cuerpo de la petición
             body = await request.body()
+            # Si existe el cuerpo de la petición...
             if body:
+                # Conversión del cuerpo a diccionario
                 json_body = json.loads(body)
-                request._body = json.dumps(_convert_keys_to_snake_case(json_body)).encode("utf-8")
+                # Transformación del cuerpo de la petición
+                request._body = (
+                    # Conversión a JSON de...
+                    json.dumps(
+                        # Conversión de las llaves a snake case
+                        convert_keys_to_snake_case(json_body)
+                    )
+                    # Codificación a UTF-8
+                    .encode("utf-8")
+                )
 
-        # Llamamos al endpoint de FastAPI
+        # Llamada al endpoint de la API
         response = await call_next(request)
 
-        # Guardamos la respuesta original antes de leer el body_iterator
+        # Se guarda la respuesta original antes de leer el body_iterator
         original_response = response
 
-
-        # Convertimos la respuesta a camelCase si es JSON
+        # Si la respuesta de la API es JSON...
         if response.headers.get("content-type") == "application/json":
+            # Obtención del cuerpo de la respuesta
             body = [section async for section in response.body_iterator]
+            # Decodificación
             response_body = b"".join(body).decode("utf-8")
 
             try:
+                # Conversión del JSON a diccionario
                 json_data = json.loads(response_body)
+
                 # Manejo de los datos si se trata de un token de autenticación
-                if 'access_token' in json_data and 'token_type' in json_data:
+                if is_json_like(json_data) and is_token_provition(json_data):
+                    # Se guarda el token para almacenarse en la misma llave
                     token = json_data['access_token']
-                    camel_case_data = _convert_keys_to_camel_case(json_data)
+                    # Conversión de las llaves a camel case
+                    camel_case_data = convert_keys_to_camel_case(json_data)
+                    # Se guarda el token en el cuerpo a retornar
                     camel_case_data['access_token'] = token
-                elif 'openapi' not in json_data:
-                    camel_case_data = _convert_keys_to_camel_case(json_data)
+
+                # Manejo de datos si no es una respuesta del esquema OpenAPI
+                elif is_json_like(json_data) and not is_open_api_response(json_data):
+                    # Conversión de las llaves a camel case
+                    camel_case_data = convert_keys_to_camel_case(json_data)
+
+                # Se mantiene el cuerpo intacto
                 else:
                     camel_case_data = json_data
-                
-                # Eliminamos Content-Length antes de devolver la respuesta
+
+                # Se elimina la longitud del contenido antes de devolver la respuesta
                 headers = dict(original_response.headers)
                 headers.pop("content-length", None)
 
+                # Creación de objeto de respuesta
                 response = Response(
-                    content=json.dumps(camel_case_data),
-                    status_code=original_response.status_code,
-                    headers=headers,
-                    media_type="application/json",
+                    content= json.dumps(camel_case_data),
+                    status_code= original_response.status_code,
+                    headers= headers,
+                    media_type= "application/json",
                 )
             except json.JSONDecodeError:
                 pass  # Si no es JSON, enviarlo sin cambios
