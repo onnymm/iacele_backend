@@ -22,6 +22,9 @@ class _SearchReadRecords(TypedDict):
 class _PostRequestData(BaseModel):
     table_name: DBTable = Body()
 
+class _Create(_PostRequestData):
+    data: _Record | list[_Record]
+
 class _GetRequestData(BaseModel):
     table_name: DBTable = Query()
 
@@ -43,12 +46,17 @@ class _Update(_PostRequestData):
     record_id: int = Body()
     data_to_write: dict = Body()
 
+class _Delete(_GetRequestData):
+    record_ids: int | list[int]
+
 # Modelos para endpoints
 
 class crud():
+    create = _Create
     read = _Read
     search_read = _SearchRead
     update = _Update
+    delete = _Delete
 
 class response():
     records = _Records

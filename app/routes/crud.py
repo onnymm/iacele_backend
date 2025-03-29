@@ -17,12 +17,37 @@ router = APIRouter(
     tags= ['CRUD']
 )
 
+@router.post(
+    '/create',
+    name= 'Creación de registros',
+    status_code= status.HTTP_201_CREATED,
+)
+async def _create(
+    params: crud.create,
+    _: UserInDB = Depends(get_current_user),
+) -> bool:
+    """
+    ## Creación de registros
+    Este endpoint permite la creación de uno o más registros en una tabla de la
+    base de datos.
+
+    ### Los parámetros de entrada son:
+    - `tableName`: Nombre de la tabla de donde se crearán los registros.
+    - `data`: Diccionario o lista de diccionarios de atributos de los registros
+    a crear.
+    """
+
+    return db_connection.create(
+        params.table_name,
+        params.data,
+    )
+
 @router.get(
     '/read',
     name= 'Lectura de registros',
     status_code= status.HTTP_200_OK,
 )
-def _read(
+async def _read(
     params: crud.read,
     _: UserInDB = Depends(get_current_user),
 ) -> response.records:
@@ -58,7 +83,7 @@ def _read(
     name= 'Búsqueda de registros',
     status_code= status.HTTP_200_OK,
 )
-def _search_read(
+async def _search_read(
     params: crud.search_read,
     _: UserInDB = Depends(get_current_user),
 ) -> response.search_read:
@@ -81,9 +106,9 @@ def _search_read(
     ### Estructura de criterio de búsqueda
     La estructura del criterio de búsqueda consiste en una lista de tuplas de 3 valores, mejor
     conocidas como tripletas. Cada una de estas tripletas consiste en 3 diferentes parámetros:
-    1. Nombre del campo de la tabla
-    2. Operador de comparación
-    3. Valor de comparación
+    1. Nombre del campo de la tabla.
+    2. Operador de comparación.
+    3. Valor de comparación.
 
     Algunos ejemplos de tripletas son:
     ```py
@@ -153,7 +178,7 @@ def _search_read(
     name= "Modificación de un registro",
     status_code= status.HTTP_200_OK,
 )
-def _update(
+async def _update(
     params: crud.update,
     _: UserInDB = Depends(get_current_user),
 ) -> bool:
@@ -165,9 +190,9 @@ def _update(
     todos los registros provistos.
 
     ### Los parámetros de entrada son:
-    - `tableName`: Nombre de la tabla en donde se harán los cambios
-    - `recordIds`: ID o lista de IDs a actualizar
-    - `data`: Diccionario de valores a modificar masivamente
+    - `tableName`: Nombre de la tabla en donde se harán los cambios.
+    - `recordIds`: ID o lista de IDs a actualizar.
+    - `data`: Diccionario de valores a modificar masivamente.
     """
 
     # Actualización en la base de datos
@@ -178,3 +203,24 @@ def _update(
     )
 
     return True
+
+@router.delete(
+    '/delete',
+    name= 'Eliminación de registros',
+    status_code= status.HTTP_200_OK,
+)
+async def _delete(
+    params: crud.delete,
+    _: UserInDB = Depends(get_current_user)
+):
+    """
+    ## Eliminación de registros
+    Este endpoint permite la eliminación de uno o más registros en una tabla de
+    la base de datos.
+
+    ### Parámetros de entrada
+    - `tableName`: Nombre de la tabla de donde se eliminarán los registros.
+    - `recordIds`: ID o lista de IDs de los registros a eliminar.
+    """
+
+    return True;
