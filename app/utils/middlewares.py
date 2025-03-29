@@ -29,7 +29,7 @@ def is_json_like(json_data: Any) -> bool:
     return isinstance(json_data, dict) or isinstance(json_data, list)
 
 def is_open_api_response(json_data: dict) -> bool:
-    'openapi' in json_data
+    return 'openapi' in json_data
 
 def is_token_provition(json_data: dict) -> bool:
-    'access_token' in json_data and 'token_type' in json_data
+    return 'access_token' in json_data and 'token_type' in json_data
