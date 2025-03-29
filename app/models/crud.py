@@ -11,7 +11,7 @@ from dml_manager import CriteriaStructure
 from app.types import DBTable
 from pydantic.alias_generators import to_camel
 
-_RecordValue = Union[int, float, str, list[int]]
+_RecordValue = Union[int, float, str, bool, list[int], None]
 _Record = dict[str, _RecordValue]
 _Records = list[_Record]
 
