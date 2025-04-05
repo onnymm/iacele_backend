@@ -7,6 +7,6 @@ from .data_view import (
 from .odoo_models import ModelFields
 from .users import UserData, UserInDB
 from .crud import (
-    crud,
+    request,
     response,
 )

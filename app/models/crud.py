@@ -9,7 +9,6 @@ from fastapi import (
 )
 from dml_manager import CriteriaStructure
 from app.types import DBTable
-from pydantic.alias_generators import to_camel
 
 _RecordValue = Union[int, float, str, bool, list[int], None]
 _Record = dict[str, _RecordValue]
@@ -20,16 +19,16 @@ class _SearchReadRecords(TypedDict):
     count: int
 
 class _PostRequestData(BaseModel):
-    table_name: DBTable = Body()
+    table_name: DBTable = Body(...)
 
 class _Create(_PostRequestData):
     data: _Record | list[_Record]
 
 class _GetRequestData(BaseModel):
-    table_name: DBTable = Query()
+    table_name: DBTable = Query(...)
 
 class _Read(_GetRequestData):
-    record_ids: int | list[int] = Query()
+    record_ids: int | list[int] = Query(...)
     fields: list[str] = Query([])
     sortby: str | list[str] = Query(None)
     ascending: bool | list[bool] = Query(True)
@@ -43,15 +42,15 @@ class _SearchRead(_PostRequestData):
     ascending: bool | list[bool] = Body(True)
 
 class _Update(_PostRequestData):
-    record_id: int = Body()
-    data_to_write: dict = Body()
+    record_id: int = Body(...)
+    data_to_write: dict = Body(...)
 
 class _Delete(_GetRequestData):
-    record_ids: int | list[int]
+    record_ids: int | list[int] = Query(...)
 
 # Modelos para endpoints
 
-class crud():
+class request():
     create = _Create
     read = _Read
     search_read = _SearchRead

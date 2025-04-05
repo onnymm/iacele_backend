@@ -1,11 +1,12 @@
 from fastapi import (
     Depends,
+    Query,
     APIRouter,
     status,
 )
 from app.models import (
     UserInDB,
-    crud,
+    request,
     response,
 )
 from app.security import get_current_user
@@ -23,7 +24,7 @@ router = APIRouter(
     status_code= status.HTTP_201_CREATED,
 )
 async def _create(
-    params: crud.create,
+    params: request.create,
     _: UserInDB = Depends(get_current_user),
 ) -> bool:
     """
@@ -48,7 +49,7 @@ async def _create(
     status_code= status.HTTP_200_OK,
 )
 async def _read(
-    params: crud.read,
+    params: request.read = Query(),
     _: UserInDB = Depends(get_current_user),
 ) -> response.records:
     """
@@ -84,7 +85,7 @@ async def _read(
     status_code= status.HTTP_200_OK,
 )
 async def _search_read(
-    params: crud.search_read,
+    params: request.search_read,
     _: UserInDB = Depends(get_current_user),
 ) -> response.search_read:
     """
@@ -179,7 +180,7 @@ async def _search_read(
     status_code= status.HTTP_200_OK,
 )
 async def _update(
-    params: crud.update,
+    params: request.update,
     _: UserInDB = Depends(get_current_user),
 ) -> bool:
     """
@@ -210,7 +211,7 @@ async def _update(
     status_code= status.HTTP_200_OK,
 )
 async def _delete(
-    params: crud.delete,
+    params: request.delete,
     _: UserInDB = Depends(get_current_user)
 ):
     """
