@@ -18,7 +18,7 @@ def define_local_origin() -> str:
                 start, end = re.search(r"192\.168\.\d{1,3}\.\d{1,3}", line).span()
                 ip = line[start:end]
                 break
-    
+
     # Se elimina el archivo
     os.system("rm temp_file")
 

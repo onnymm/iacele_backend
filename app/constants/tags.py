@@ -1,6 +1,6 @@
-class tags():
-    authentication = 'Autenticación'
-    odoo = 'Odoo'
-    sales = 'Ventas'
-    tasks = 'Tareas'
-    account = 'Cuenta'
+class TAG():
+    AUTHENTICATION = 'Autenticación'
+    ODOO = 'Odoo'
+    SALES = 'Ventas'
+    TASKS = 'Tareas'
+    ACCOUNT = 'Cuenta'

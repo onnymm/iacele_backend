@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Query, Body, Depends
 from fastapi.exceptions import HTTPException
-from app.constants.tags import tags
+from app.constants.tags import TAG
 from app.security.auth import hash_password, get_current_user, authenticate_user
 from app.database import db_connection
 from app.models.users import UserNewData, UserInDB, ChangePassword
@@ -8,7 +8,7 @@ from app.utils.data_transformation import remove_nonetypes
 
 router = APIRouter(
     prefix= '/account',
-    tags= [tags.account],
+    tags= [TAG.ACCOUNT],
 )
 
 @router.get(

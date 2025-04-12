@@ -1,10 +1,10 @@
 from fastapi import APIRouter, status
-from app.constants import tags
+from app.constants import TAG
 from app.core import tasks
 
 router = APIRouter(
     prefix= '/tasks',
-    tags= [tags.tasks],
+    tags= [TAG.TASKS],
 )
 
 @router.post(
