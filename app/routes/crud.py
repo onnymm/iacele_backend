@@ -39,7 +39,7 @@ async def _create(
     """
 
     return db_connection.create(
-        params.table_name,
+        params.table,
         params.data,
     )
 
@@ -153,7 +153,7 @@ async def _search_read(
 
     # Búsqueda y lectura de los registros
     data = db_connection.search_read(
-        params.table_name,
+        params.table,
         params.search_criteria,
         params.fields,
         params.offset,
@@ -164,7 +164,7 @@ async def _search_read(
 
     # Conteo de resultados
     count = db_connection.search_count(
-        params.table_name,
+        params.table,
         params.search_criteria,
     )
 
@@ -198,7 +198,7 @@ async def _update(
 
     # Actualización en la base de datos
     db_connection.update(
-        params.table_name,
+        params.table,
         params.record_id,
         params.data_to_write,
     )

@@ -19,7 +19,7 @@ class _SearchReadRecords(TypedDict):
     count: int
 
 class _PostRequestData(BaseModel):
-    table_name: DBTable = Body(...)
+    table: DBTable = Body(...)
 
 class _Create(_PostRequestData):
     data: _Record | list[_Record]
