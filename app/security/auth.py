@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from app import settings
 from app.database import db_connection
 from app.models import UserData, UserInDB
+from dml_manager import CriteriaStructure
 
 class Token(BaseModel):
     """
@@ -49,9 +50,15 @@ def _get_user(username) -> UserInDB | bool:
     la base de datos y lo retorna. En caso de no encontrarlo, retorna `False`.
     """
 
+    criteria: CriteriaStructure = [
+        '&',
+            ('user', '=', username),
+            ('active', '=', True)
+    ]
+
     # Intento de obtención de usuario
     try:
-        [ user ] = db_connection.search_read('base.users', ['&', ('user', '=', username), ('active', '=', True)], output_format= "dict")
+        [ user ] = db_connection.search_read('base.users', criteria, output_format= "dict")
 
     # Ausencia de usuario
     except ValueError:
