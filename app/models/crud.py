@@ -25,7 +25,7 @@ class _Create(_PostRequestData):
     data: _Record | list[_Record]
 
 class _GetRequestData(BaseModel):
-    table_name: DBTable = Query(...)
+    table: DBTable = Query(...)
 
 class _Read(_GetRequestData):
     record_ids: int | list[int] = Query(...)

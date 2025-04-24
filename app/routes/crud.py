@@ -68,7 +68,7 @@ async def _read(
 
     # Lectura de registros
     data = db_connection.read(
-        params.table_name,
+        params.table,
         params.record_ids,
         params.fields,
         params.sortby,
