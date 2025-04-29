@@ -7,7 +7,7 @@ from app.routes import (
     authentication,
     crud,
     tasks,
-    actions,
+    server,
 )
 
 # App del servidor 
@@ -33,7 +33,7 @@ app.include_router(account.router)
 app.include_router(crud.router)
 
 # Ruta para Ejecución de acciones
-app.include_router(actions.router)
+app.include_router(server.router)
 
 # Tareas
 app.include_router(tasks.router)

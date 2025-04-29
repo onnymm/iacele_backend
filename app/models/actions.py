@@ -3,6 +3,11 @@ from fastapi import Body
 from pydantic import BaseModel
 
 class Action(BaseModel):
-    record_ids: int | list[int] = Body(...)
     table: DBTable = Body(...)
     action: str = Body(...)
+    record_ids: int | list[int] = Body(...)
+    data: dict = Body({})
+
+class Task(BaseModel): 
+    table: DBTable = Body(...)
+    task: str = Body(...)
