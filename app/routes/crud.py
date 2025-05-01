@@ -224,4 +224,7 @@ async def _delete(
     - `recordIds`: ID o lista de IDs de los registros a eliminar.
     """
 
-    return True;
+    # Eliminación de los registros en la base de datos
+    db_connection.delete(params.table, params.record_ids)
+
+    return True

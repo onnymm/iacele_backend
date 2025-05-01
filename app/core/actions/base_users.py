@@ -33,26 +33,31 @@ def reset_password(params: Action) -> None:
 @IACele.register_action('base.users')
 def create(params: Action) -> None:
     data = odoo.read('res.users', params.record_ids, ['name', 'login'], output= 'dict')
-    return [
-        {
-            'user': record['login'],
-            'name': record['name'],
-            'odoo_id': record['id'],
-            'password': hash_password(settings.base.NEW_USER_PASSWORD),
-            'active': True,
-        } for record in data
-    ]
+    db_connection.create(
+        'base.users',
+        [
+            {
+                'user': record['login'],
+                'name': record['name'],
+                'odoo_id': record['id'],
+                'password': hash_password(settings.base.NEW_USER_PASSWORD),
+                'active': True,
+            } for record in data
+        ]
+    )
 
 @IACele.register_task('base.users')
 def update_users():
 
     def wrapped_create(record_ids: int | list[int]):
         action = Action(table= 'base.users', action= 'create', record_ids= record_ids, data= {})
-        return create(action)
+        if record_ids:
+            create(action)
 
     def wrapped_deactivate_user(record_ids: int | list[int]):
         action = Action(table= 'base.users', action= 'deactivate_user', record_ids= record_ids, data= {})
-        return deactivate_user(action)
+        if record_ids:
+            deactivate_user(action)
 
     users_api = odoo.search_read('res.users', [], ['name', 'login'])
     users_db: pd.DataFrame = db_connection.search_read('base.users', fields=['odoo_id'], output_format= 'dataframe')
