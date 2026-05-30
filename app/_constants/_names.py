@@ -6,12 +6,15 @@ class AUTH:
 
 class ROUTER_PREFIX:
     TOKEN = '/token'
+    ACCOUNT = '/account'
     CRUD = '/crud'
     SERVER = '/server'
 
 class ENDPOINT_PATH:
     class AUTH:
         TOKEN = ROOT_PATH
+    class ACCOUNT:
+        ME = '/me'
     class CRUD:
         CREATE = '/create'
         SEARCH = '/search'
@@ -26,6 +29,8 @@ class ENDPOINT_PATH:
 class ENDPOINT_NAME:
     class AUTH:
         TOKEN = 'Obtención de token'
+    class ACCOUNT:
+        ME = 'Mi usuario'
     class CRUD:
         CREATE = 'Creación de registros'
         SEARCH = 'Búsqueda de registros'
@@ -39,6 +44,7 @@ class ENDPOINT_NAME:
 
 class TAG:
     AUTH = 'Autenticación'
+    ACCOUNT = 'Cuenta'
     CRUD = 'Transacciones CRUD'
     SERVER = 'Procesos de servidor'
 

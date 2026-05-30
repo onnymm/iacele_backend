@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app import iacele
 from app._routes import auth
+from app._routes import account
 from app._routes import crud
 from app._routes import server
 from app._settings import CONFIG
@@ -14,6 +15,7 @@ app = FastAPI()
 
 # Adición de routers
 app.include_router(auth.router)
+app.include_router(account.router)
 app.include_router(crud.router)
 app.include_router(server.router)
 
