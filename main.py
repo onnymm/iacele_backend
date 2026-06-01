@@ -22,7 +22,7 @@ app.include_router(server.router)
 # Control de middlewares para permitir las solicitudes desde el servidor frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins= [CONFIG.FRONTEND_URL],
+    allow_origins= CONFIG.FRONTEND_URLS,
     allow_credentials= True,
     allow_methods= ['*'],
     allow_headers= ['*'],
