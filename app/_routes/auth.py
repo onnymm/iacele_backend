@@ -3,6 +3,8 @@ from fastapi import status
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
+from lylac.errors import IncorrectPasswordError
+from lylac.errors import UserNotFoundError
 import jwt
 from .._api.models import TokenData
 from .._constants import AUTH
@@ -13,6 +15,8 @@ from .._constants import TAG
 from .._core import iacele
 from .._settings import CONFIG
 from .._constants import SESSION_UUID
+from .._errors import user_not_found_error
+from .._errors import wrong_password_error
 
 # Inicialización de router de obtención de token
 router = APIRouter(
@@ -33,8 +37,17 @@ async def _login_for_access_token(
     user_login = form_data.username
     password = form_data.password
 
-    # Obtención de UUID de sesión
-    session_uuid = iacele.login(user_login, password)
+    # Intento de autenticación
+    try:
+        # Obtención de UUID de sesión
+        session_uuid = iacele.login(user_login, password)
+    # Si la contraseña es incorrecta...
+    except IncorrectPasswordError:
+        raise wrong_password_error
+    # Si el usuario no fue encontrado...
+    except UserNotFoundError:
+        raise user_not_found_error
+
     # Construcción de datos a codificar
     data_to_encode = {SESSION_UUID: session_uuid}
     # Creación de token de acceso
