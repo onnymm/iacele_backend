@@ -26,3 +26,5 @@ PRESET_PROFILE_FIELDS = [
 class LOCATION:
     CSL = 'csl'
     SJC = 'sjc'
+
+EMPTY_SESSION_UUID_VALUE = 'null'
