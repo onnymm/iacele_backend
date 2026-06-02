@@ -12,3 +12,9 @@ user_not_found_error = HTTPException(
     status_code= status.HTTP_404_NOT_FOUND,
     detail= 'El usuario no existe.'
 )
+
+# Instancia de token de autenticación inválido
+invalid_token_error = HTTPException(
+    status_code= status.HTTP_403_FORBIDDEN,
+    detail= 'Token inválido'
+)
