@@ -23,6 +23,7 @@ class ENDPOINT_PATH:
         SEARCH = '/search'
         READ = '/read'
         SEARCH_READ = '/search_read'
+        SEARCH_COUNT = '/search_count'
         UPDATE = '/update'
         DELETE = '/delete'
     class SERVER:
@@ -39,6 +40,7 @@ class ENDPOINT_NAME:
         SEARCH = 'Búsqueda de registros'
         READ = 'Lectura de registros'
         SEARCH_READ = 'Búsqueda y lectura de registros'
+        SEARCH_COUNT = 'Conteo de búsqueda de registros'
         UPDATE = 'Modificación de registros'
         DELETE = 'Eliminación de registros'
     class METADATA:

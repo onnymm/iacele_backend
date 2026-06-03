@@ -39,6 +39,12 @@ class CRUD:
     ):
         ...
 
+    class SearchCount(
+        _RequiresModelName,
+        _SupportsFiltering,
+    ):
+        ...
+
     class Update(
         _RequiresModelName,
         _RequiresRecordIDs,

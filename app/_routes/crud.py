@@ -77,6 +77,21 @@ async def _search_read(
 
     return records_data
 
+@router.post(
+    ENDPOINT_PATH.CRUD.SEARCH_COUNT,
+    name= ENDPOINT_NAME.CRUD.SEARCH_COUNT,
+    status_code= status.HTTP_200_OK,
+)
+def _search_count(
+    params: CRUD.SearchCount,
+    session_uuid: Annotated[str, Depends(authenticate_user)],
+) -> int:
+
+    # Conteo de búsqueda de registros
+    count = iacele.search_count(session_uuid, **params.model_dump())
+
+    return count
+
 @router.patch(
     ENDPOINT_PATH.CRUD.UPDATE,
     name= ENDPOINT_NAME.CRUD.UPDATE,
