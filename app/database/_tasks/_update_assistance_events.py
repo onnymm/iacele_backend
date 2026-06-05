@@ -5,6 +5,7 @@ from datetime import timedelta
 from ..._constants import LOCAL_TZ
 from ..._core import Lylac
 from ..._core import iacele
+import re
 
 attendance = Attendance()
 
@@ -112,7 +113,7 @@ def _update_assistance_events(ctx: Lylac.ServerTaskContext) -> None:
                     # Obtención de valores
                     record_to_create['employee_id'] = ctx.get_resource_id(f'hr_employee.{record_from_api['user_id']}')
                     record_to_create['original_registry_time'] = record_from_api['registry_time']
-                    record_to_create['original_status'] = record_from_api['status']
+                    record_to_create['original_status'] = re.sub(r'([A-Z])', r'_\1', record_from_api['status']).lower()
                     record_to_create['device_id'] = device_id
                     record_to_create['from_api'] = True
 

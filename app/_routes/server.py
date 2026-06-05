@@ -43,6 +43,6 @@ async def _task(
 ) -> Literal[True]:
 
     # Ejecución de tarea de servidor
-    result = iacele.task(session_uuid, **params.model_dump())
+    iacele.task(session_uuid, **params.model_dump())
 
-    return result
+    return True
