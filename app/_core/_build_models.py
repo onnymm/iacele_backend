@@ -50,6 +50,38 @@ def _build_models_structure(ctx: Lylac.TransactionContext):
                             'ttype': 'selection',
                             'nullable': False,
                             'is_required': True,
+                            'selection_ids': {
+                                'create': [
+                                    {
+                                        'name': 'monday',
+                                        'label': 'Lunes',
+                                    },
+                                    {
+                                        'name': 'tuesday',
+                                        'label': 'Martes',
+                                    },
+                                    {
+                                        'name': 'wednesday',
+                                        'label': 'Miércoles',
+                                    },
+                                    {
+                                        'name': 'thursday',
+                                        'label': 'Jueves',
+                                    },
+                                    {
+                                        'name': 'friday',
+                                        'label': 'Viernes',
+                                    },
+                                    {
+                                        'name': 'saturday',
+                                        'label': 'Sábado',
+                                    },
+                                    {
+                                        'name': 'sunday',
+                                        'label': 'Domingo',
+                                    },
+                                ],
+                            },
                         },
                         {
                             'name': 'start_time',
@@ -222,6 +254,38 @@ def _build_models_structure(ctx: Lylac.TransactionContext):
                             'ttype': 'selection',
                             'nullable': False,
                             'is_required': True,
+                            'selection_ids': {
+                                'create': [
+                                    {
+                                        'name': 'monday',
+                                        'label': 'Lunes',
+                                    },
+                                    {
+                                        'name': 'tuesday',
+                                        'label': 'Martes',
+                                    },
+                                    {
+                                        'name': 'wednesday',
+                                        'label': 'Miércoles',
+                                    },
+                                    {
+                                        'name': 'thursday',
+                                        'label': 'Jueves',
+                                    },
+                                    {
+                                        'name': 'friday',
+                                        'label': 'Viernes',
+                                    },
+                                    {
+                                        'name': 'saturday',
+                                        'label': 'Sábado',
+                                    },
+                                    {
+                                        'name': 'sunday',
+                                        'label': 'Domingo',
+                                    },
+                                ],
+                            },
                         },
                     ]
                 }
@@ -306,6 +370,30 @@ def _build_models_structure(ctx: Lylac.TransactionContext):
                             'ttype': 'selection',
                             'nullable': False,
                             'is_required': True,
+                            'selection_ids': {
+                                'create': [
+                                    {
+                                        'name': 'check_in',
+                                        'label': 'Entrada',
+                                    },
+                                    {
+                                        'name': 'break_out',
+                                        'label': 'Inicio de comida',
+                                    },
+                                    {
+                                        'name': 'break_in',
+                                        'label': 'Fin de comida',
+                                    },
+                                    {
+                                        'name': 'check_out',
+                                        'label': 'Salida',
+                                    },
+                                    {
+                                        'name': 'undefined',
+                                        'label': 'Indefinido',
+                                    },
+                                ],
+                            },
                         },
                         {
                             'name': 'device_id',
@@ -330,6 +418,34 @@ def _build_models_structure(ctx: Lylac.TransactionContext):
                             'name': 'status_correction',
                             'label': 'Corrección de tipo de registro original',
                             'ttype': 'selection',
+                            'selection_ids': {
+                                'create': [
+                                    {
+                                        'name': 'check_in',
+                                        'label': 'Entrada',
+                                    },
+                                    {
+                                        'name': 'break_out',
+                                        'label': 'Inicio de comida',
+                                    },
+                                    {
+                                        'name': 'break_in',
+                                        'label': 'Fin de comida',
+                                    },
+                                    {
+                                        'name': 'check_out',
+                                        'label': 'Salida',
+                                    },
+                                    {
+                                        'name': 'undefined',
+                                        'label': 'Indefinido',
+                                    },
+                                    {
+                                        'name': 'null',
+                                        'label': 'Anulado',
+                                    },
+                                ],
+                            },
                         },
                         {
                             'name': 'day_id',
@@ -364,40 +480,6 @@ def _build_models_structure(ctx: Lylac.TransactionContext):
     ctx.create(
         'base.model',
         [
-            # Modelo de correcciones de eventos de asistencias
-            {
-                'name': 'assistance_registry_event_correction',
-                'model': 'assistance.registry.event.correction',
-                'label': 'Corrección de eventos de registro de asistencia',
-                'transient': True,
-                'field_ids': {
-                    'create': [
-                        {
-                            'name': 'employee_id',
-                            'label': 'Empleado',
-                            'ttype': 'many2one',
-                            'related_model_id': ctx.get_resource_id('base_model.hr_employee'),
-                            'nullable': False,
-                            'is_required': True,
-                            'on_delete': 'restrict',
-                        },
-                        {
-                            'name': 'registry_time',
-                            'label': 'Fecha y hora de registro',
-                            'ttype': 'datetime',
-                            'nullable': False,
-                            'is_required': True,
-                        },
-                        {
-                            'name': 'status',
-                            'label': 'Tipo de registro',
-                            'ttype': 'selection',
-                            'nullable': False,
-                            'is_required': True,
-                        },
-                    ],
-                }
-            },
             # Modelo de credenciales de actualización de eventos de asistencia
             {
                 'name': 'assistance_registry_event_credentials',
