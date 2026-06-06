@@ -8,6 +8,7 @@ class ROUTER_PREFIX:
     TOKEN = '/token'
     ACCOUNT = '/account'
     CRUD = '/crud'
+    FRONTEND = '/frontend'
     METADATA = '/metadata'
     SERVER = '/server'
 
@@ -26,6 +27,8 @@ class ENDPOINT_PATH:
         SEARCH_COUNT = '/search_count'
         UPDATE = '/update'
         DELETE = '/delete'
+    class FRONTEND:
+        TREE = '/tree'
     class SERVER:
         ACTION = '/action'
         TASK = '/task'
@@ -43,6 +46,8 @@ class ENDPOINT_NAME:
         SEARCH_COUNT = 'Conteo de búsqueda de registros'
         UPDATE = 'Modificación de registros'
         DELETE = 'Eliminación de registros'
+    class FRONTEND:
+        TREE = 'Búsqueda y lectura para vista de árbol'
     class METADATA:
         FIELDS = 'Metadatos de campos'
     class SERVER:
@@ -52,6 +57,7 @@ class ENDPOINT_NAME:
 class TAG:
     AUTH = 'Autenticación'
     ACCOUNT = 'Cuenta'
+    FRONTEND = 'Frontend'
     METADATA = 'Metadatos'
     CRUD = 'Transacciones CRUD'
     SERVER = 'Procesos de servidor'
