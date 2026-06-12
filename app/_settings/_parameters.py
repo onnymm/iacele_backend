@@ -10,7 +10,7 @@ class PARAMETERS:
                 'selection_ids',
                 [
                     'name',
-                    'display_name',
+                    ('display_name', 'label'),
                 ],
             ),
             'readonly',
