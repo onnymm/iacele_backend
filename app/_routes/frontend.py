@@ -3,12 +3,14 @@ from fastapi import status
 from fastapi import APIRouter
 from fastapi import Depends
 from .._api.models import CRUD
+from .._api.models import Frontend
 from .._constants import ENDPOINT_NAME
 from .._constants import ENDPOINT_PATH
 from .._constants import ROUTER_PREFIX
 from .._constants import TAG
 from .._core import iacele
 from .._security import authenticate_user
+from .._operations import form_read
 from .._operations import tree_search_read
 
 # Inicialización de router de transacciones CRUD
@@ -31,6 +33,24 @@ def _tree(
     result = iacele.execute_transaction(
         session_uuid,
         lambda ctx: tree_search_read(ctx, params)
+    )
+
+    return result
+
+@router.post(
+    ENDPOINT_PATH.FRONTEND.FORM,
+    name= ENDPOINT_NAME.FRONTEND.FORM,
+    status_code= status.HTTP_200_OK,
+)
+def _form(
+    params: Frontend.Form,
+    session_uuid: Annotated[str, Depends(authenticate_user)],
+):
+
+    # Obtención de registro
+    result = iacele.execute_transaction(
+        session_uuid,
+        lambda ctx: form_read(ctx, params)
     )
 
     return result

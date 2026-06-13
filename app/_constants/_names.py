@@ -29,6 +29,7 @@ class ENDPOINT_PATH:
         DELETE = '/delete'
     class FRONTEND:
         TREE = '/tree'
+        FORM = '/form'
     class SERVER:
         ACTION = '/action'
         TASK = '/task'
@@ -48,6 +49,7 @@ class ENDPOINT_NAME:
         DELETE = 'Eliminación de registros'
     class FRONTEND:
         TREE = 'Búsqueda y lectura para vista de árbol'
+        FORM = 'Lectura para vista de formulario'
     class METADATA:
         FIELDS = 'Metadatos de campos'
     class SERVER:

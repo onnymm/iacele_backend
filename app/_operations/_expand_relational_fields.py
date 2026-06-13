@@ -73,3 +73,26 @@ def tree_search_read(
         'data': data,
         'model_label': model_label,
     }
+
+def form_read(
+    ctx: Lylac.ExecutionContext,
+    params: CRUD.Read,
+):
+
+    # Expansión de campos relacionales
+    fields_to_read = _expand_relational_fields(ctx, params.model_name, params.fields)
+    # Conversión de los parámetros a diccionario
+    params_dict = params.model_dump()
+    # Sobreescritura de declaración de campos
+    params_dict['fields'] = fields_to_read
+
+    # Lectura del registro solicitado
+    [ record ] = ctx.read(**params_dict)
+
+    # Obtención del nombre del registro
+    record_name = record['display_name']
+
+    return {
+        'record': record,
+        'name': record_name,
+    }
