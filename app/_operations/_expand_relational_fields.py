@@ -1,6 +1,5 @@
 from .._api.models import CRUD
 from .._src._classes import Lylac
-from .._operations import _expand_relational_fields
 
 def _expand_relational_fields(
     ctx: Lylac.ExecutionContext,
@@ -32,7 +31,7 @@ def _expand_relational_fields(
     ]
 
     # Inicialización de lista de campos enriquecidos
-    resolved_fields = []
+    resolved_fields = ['display_name']
 
     # Iteración por cada declaración de campo a leer
     for field in requested:
