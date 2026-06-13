@@ -24,7 +24,7 @@ def authenticate_user(
     # Intento de verificación de firma
     try:
         # Obtención de la UUID de sesión del usuario
-        session_uuid = (
+        session_uuid: str = (
             jwt.decode(
                 token,
                 CONFIG.CRYPT_KEY,

@@ -4,7 +4,6 @@ from lylac import Lylac as _Lylac
 MODELS = Literal[
     'assistance.registry.day',
     'assistance.registry.event',
-    'assistance.registry.event.correction',
     'assistance.registry.event.credentials',
     'assistance.registry.event.sync',
     'hr.employee',
