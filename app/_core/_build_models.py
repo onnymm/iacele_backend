@@ -485,7 +485,6 @@ def _build_models_structure(ctx: Lylac.TransactionContext):
                 'name': 'assistance_registry_event_credentials',
                 'model': 'assistance.registry.event.credentials',
                 'label': 'Credenciales de sincronización de eventos de asistencia',
-                'transient': True,
                 'field_ids': {
                     'create': [
                         {
