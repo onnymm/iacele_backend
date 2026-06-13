@@ -771,6 +771,30 @@ def _create_permission_groups(ctx: Lylac.TransactionContext):
                         },
                     ],
                 },
+                'rule_ids': {
+                    'create': [
+                        {
+                            'name': 'all_records',
+                            'label': 'Todos los registros',
+                            'domain': "[('id', '!=', None)]",
+                            'perm_create': True,
+                            'perm_read': True,
+                            'perm_update': True,
+                            'perm_delete': True,
+                            'model_id': ctx.get_resource_id('base_model.assistance_registry_day'),
+                        },
+                        {
+                            'name': 'all_records',
+                            'label': 'Todos los registros',
+                            'domain': "[('id', '!=', None)]",
+                            'perm_create': True,
+                            'perm_read': True,
+                            'perm_update': True,
+                            'perm_delete': True,
+                            'model_id': ctx.get_resource_id('base_model.assistance_registry_event'),
+                        },
+                    ],
+                },
             },
         ],
     )
