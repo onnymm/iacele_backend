@@ -5,11 +5,11 @@ from fastapi import Depends
 from lylac.errors import InvalidSessionUUIDError
 from .._constants import ENDPOINT_NAME
 from .._constants import ENDPOINT_PATH
-from .._constants import PRESET_PROFILE_FIELDS
 from .._constants import ROUTER_PREFIX
 from .._constants import TAG
 from .._core import iacele
 from .._errors import invalid_token_error
+from .._operations import me
 from .._security import authenticate_user
 
 # Inicialización de router de transacciones de cuenta
@@ -29,10 +29,8 @@ async def _me(
 
     # Intento de obtención de los datos de usuario
     try:
-        my_user_data = iacele.me(
-            session_uuid,
-            PRESET_PROFILE_FIELDS,
-        )
+        # Obtención de los datos del usuario de la sesión
+        my_user_data = iacele.execute_transaction(session_uuid, me)
     # Si la UUID de sesión es inválida...
     except InvalidSessionUUIDError:
         # Se arroja error
