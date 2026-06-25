@@ -5,7 +5,7 @@ class PARAMETERS:
             'label',
             'ttype',
             'help_info',
-            'related_model_id',
+            ('related_model_id.model', 'related_model'),
             (
                 'selection_ids',
                 [
