@@ -54,9 +54,6 @@ class _RequiresRecordID(BaseModel):
 class _RequiresRecordIDs(BaseModel):
     record_ids: _ScalarOrList[int]
 
-class _RequiresRecordID(BaseModel):
-    record_ids: int
-
 class _SupportsSelectableFields(BaseModel):
     fields: FieldsSelectionLevel1 = []
 
