@@ -31,7 +31,7 @@ def _expand_relational_fields(
     ]
 
     # Inicialización de lista de campos enriquecidos
-    resolved_fields = ['display_name']
+    resolved_fields = []
 
     # Iteración por cada declaración de campo a leer
     for field in requested:
@@ -43,6 +43,11 @@ def _expand_relational_fields(
         else:
             # Se añade éste sin ningún campo
             resolved_fields.append(field)
+
+    # Si el campo [display_name] no se encuentra en los campos resueltos...
+    if 'display_name' not in resolved_fields:
+        # Se añade éste
+        resolved_fields.append('display_name')
 
     return resolved_fields
 
