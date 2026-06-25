@@ -30,7 +30,7 @@ def _assistance_registry_event__registry_time(
     'assistance.registry.event',
     'status',
     'Tipo de registro',
-    'datetime',
+    'selection',
 )
 def _assistance_registry_event__status(
     ctx: Lylac.ComputeContext,
@@ -73,3 +73,36 @@ def _assistance_registry_event__is_correction(
     )
 
     return is_correction
+
+@iacele.api.compute.register_field(
+    'assistance.registry.event',
+    'display_name',
+    'Nombre a mostrar',
+    'char',
+)
+def _assistance_registry_event__display_name(
+    ctx: Lylac.ComputeContext,
+):
+
+    # Obtención del valor de tipo de registro efectivo
+    status = ctx['status']
+
+    name = ctx['employee_id.name']
+
+    # Cómputo de etiqueta
+    label = ctx.case(
+        (status == 'check_in', 'Entrada'),
+        (status == 'break_out', 'Inicio de comida'),
+        (status == 'break_in', 'Fin de comida'),
+        (status == 'check_out', 'Salida'),
+        (status == 'undefined', 'Indefinido'),
+        (status == 'null', 'Anulado'),
+    )
+
+    # Obtención de hora de registro
+    time = ctx.cast('registry_time', 'time')
+
+    # Cómputo de nombre a mostrar
+    display_name = ctx.concat(label, ' (', name, ') [', time, ']')
+
+    return display_name
