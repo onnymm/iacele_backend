@@ -167,7 +167,7 @@ def _assistance_registry_day__allowed_start(
 @iacele.api.compute.register_field(
     'assistance.registry.day',
     'allowed_end',
-    'Inicio de jornada laboral permitido',
+    'Fin de jornada laboral permitido',
     'time',
 )
 def _assistance_registry_day__allowed_end(
