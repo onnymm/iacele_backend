@@ -5,6 +5,7 @@ MODELS = Literal[
     'assistance.registry.day',
     'assistance.registry.event',
     'assistance.registry.event.credentials',
+    'assistance.registry.event.correction',
     'assistance.registry.event.sync',
     'hr.employee',
     'location.warehouse',

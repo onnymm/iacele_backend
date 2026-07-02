@@ -511,6 +511,71 @@ def _build_models_structure(ctx: Lylac.TransactionContext):
                     ]
                 }
             },
+            {
+                'name': 'assistance_registry_event_correction',
+                'model': 'assistance.registry.event.correction',
+                'label': 'Corrección de evento de asistencia',
+                'transient': True,
+                'field_ids': {
+                    'create': [
+                        {
+                            'name': 'event_id',
+                            'is_required': True,
+                            'label': 'Evento',
+                            'model_id': 25,
+                            'nullable': False,
+                            'on_delete': 'cascade',
+                            'readonly': True,
+                            'related_model_id': 23,
+                            'ttype': 'many2one',
+                        },
+                        {
+                            'name': 'status',
+                            'label': 'Tipo de registro',
+                            'model_id': 25,
+                            'nullable': False,
+                            'readonly': True,
+                            'selection_ids': {
+                                'create': [
+                                    {
+                                        'name': 'check_in',
+                                        'label': 'Entrada',
+                                    },
+                                    {
+                                        'name': 'break_out',
+                                        'label': 'Inicio de comida',
+                                    },
+                                    {
+                                        'name': 'break_in',
+                                        'label': 'Fin de comida',
+                                    },
+                                    {
+                                        'name': 'check_out',
+                                        'label': 'Salida',
+                                    },
+                                    {
+                                        'name': 'undefined',
+                                        'label': 'Indefinido',
+                                    },
+                                    {
+                                        'name': 'null',
+                                        'label': 'Anulado',
+                                    },
+                                ],
+                            },
+                            'ttype': 'selection',
+                        },
+                        {
+                            'name': 'registry_time',
+                            'label': 'Fecha y hora de registro',
+                            'model_id': 25,
+                            'nullable': False,
+                            'readonly': True,
+                            'ttype': 'datetime',
+                        },
+                    ],
+                },
+            },
         ]
     )
 
@@ -764,6 +829,14 @@ def _create_permission_groups(ctx: Lylac.TransactionContext):
                         {
                             'name': 'assistance_registry_event_credentials__admin',
                             'model_id': ctx.get_resource_id('base_model.assistance_registry_event_credentials'),
+                            'perm_create': True,
+                            'perm_read': True,
+                            'perm_update': True,
+                            'perm_delete': True,
+                        },
+                        {
+                            'name': 'assistance_registry_event_correction__admin',
+                            'model_id': ctx.get_resource_id('base_model.assistance_registry_event_correction'),
                             'perm_create': True,
                             'perm_read': True,
                             'perm_update': True,

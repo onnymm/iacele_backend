@@ -167,12 +167,12 @@ def populate(ctx: Lylac.TransactionContext):
             {
                 'name': LOCATION.CSL,
                 'model_id': ctx.get_resource_id('base_model.assistance_registry_event'),
-                'last_sync': '2026-05-30',
+                'last_sync': '2026-06-27',
             },
             {
                 'name': LOCATION.SJC,
                 'model_id': ctx.get_resource_id('base_model.assistance_registry_event'),
-                'last_sync': '2026-05-30',
+                'last_sync': '2026-06-27',
             },
         ]
     )

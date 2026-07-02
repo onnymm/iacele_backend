@@ -53,8 +53,8 @@ def _assistance_registry_event__status(
 
 @iacele.api.compute.register_field(
     'assistance.registry.event',
-    'is_correction',
-    'Es corrección',
+    'has_corrections',
+    'Tiene correcciones',
     'boolean'
 )
 def _assistance_registry_event__is_correction(
@@ -63,13 +63,13 @@ def _assistance_registry_event__is_correction(
 
     # Obtención de instancia de corección de fecha y hora de registro
     registry_time_correction = ctx['registry_time_correction']
-    # Obtención de valor de si el registro proviene desde la API de HikVision
-    from_api = ctx['from_api']
+    # Obtención de instancia de corrección de tipo de registro
+    status_correction = ctx['status_correction']
 
     # Evaluación de si el registro es una corrección
     is_correction = ctx.or_(
         registry_time_correction != None,
-        from_api == False,
+        status_correction != None,
     )
 
     return is_correction
