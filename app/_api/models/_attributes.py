@@ -10,7 +10,7 @@ _ScalarOrList = _T | list[_T]
 
 _FieldName = str
 
-ExpandedRecords = tuple[_FieldName | _T]
+ExpandedRecords = tuple[_FieldName, _T]
 
 _AliasedField = tuple[_T, str]
 
