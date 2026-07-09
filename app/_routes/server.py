@@ -28,9 +28,9 @@ async def _action(
 ) -> Literal[True]:
 
     # Ejecución de la acción
-    result = iacele.action(session_uuid, **params.model_dump())
+    iacele.action(session_uuid, **params.model_dump())
 
-    return result
+    return True
 
 @router.post(
     ENDPOINT_PATH.SERVER.TASK,
