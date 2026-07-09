@@ -1,5 +1,7 @@
 from . import assistance_registry_day
 from . import assistance_registry_event
+from . import assistance_registry_event_correction
+from . import assistance_registry_event_correction_history
 from . import assistance_registry_event_credentials
 from . import hr_employee
 from . import location_warehouse

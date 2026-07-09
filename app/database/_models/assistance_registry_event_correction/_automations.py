@@ -26,5 +26,15 @@ def _assistance_registry_event_correction__consume(ctx: Lylac.AutomationContext[
             {
                 'status_correction': record['status'],
                 'registry_time_correction': record['registry_time'],
+                # Generación de registro para historial
+                'correction_history_ids': {
+                    'create': [
+                        {
+                            'move_type': 'correction',
+                            'new_status': record['status'],
+                            'new_registry_time': record['registry_time'],
+                        },
+                    ],
+                },
             }
         )
