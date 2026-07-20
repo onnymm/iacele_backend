@@ -3,6 +3,7 @@ from . import assistance_registry_event
 from . import assistance_registry_event_correction
 from . import assistance_registry_event_correction_history
 from . import assistance_registry_event_credentials
+from . import base_users
 from . import hr_employee
 from . import location_warehouse
 from . import model_sync
