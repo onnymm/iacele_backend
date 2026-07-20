@@ -11,6 +11,7 @@ class ROUTER_PREFIX:
     FRONTEND = '/frontend'
     METADATA = '/metadata'
     SERVER = '/server'
+    WEBSOCKET = '/ws'
 
 class ENDPOINT_PATH:
     class AUTH:
@@ -55,6 +56,7 @@ class ENDPOINT_NAME:
     class SERVER:
         ACTION = 'Acción de registro'
         TASK = 'Tarea de servidor'
+    WEBSOCKET = 'Conexión a websocket'
 
 class TAG:
     AUTH = 'Autenticación'
@@ -63,5 +65,9 @@ class TAG:
     METADATA = 'Metadatos'
     CRUD = 'Transacciones CRUD'
     SERVER = 'Procesos de servidor'
+    WEBSOCKETS = 'Websockets'
+
+class QUERY_PARAMS:
+    TOKEN = 'token'
 
 SESSION_UUID = 'uuid'

@@ -1,6 +1,7 @@
 from ._names import AUTH
 from ._names import ENDPOINT_NAME
 from ._names import ENDPOINT_PATH
+from ._names import QUERY_PARAMS
 from ._names import ROOT_PATH
 from ._names import ROUTER_PREFIX
 from ._names import SESSION_UUID

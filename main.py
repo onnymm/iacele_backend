@@ -7,6 +7,7 @@ from app._routes import crud
 from app._routes import frontend
 from app._routes import metadata
 from app._routes import server
+from app._routes import websockets
 from app._settings import CONFIG
 
 # Inicialización final de la base de datos
@@ -22,6 +23,7 @@ app.include_router(crud.router)
 app.include_router(frontend.router)
 app.include_router(metadata.router)
 app.include_router(server.router)
+app.include_router(websockets.router)
 
 # Control de middlewares para permitir las solicitudes desde el servidor frontend
 app.add_middleware(
