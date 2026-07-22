@@ -22,7 +22,7 @@ router = APIRouter(
 )
 async def _websocket(
     websocket: WebSocket,
-):
+) -> None:
 
     # Obtención del token de autenticación
     token = websocket.query_params[QUERY_PARAMS.TOKEN]
@@ -33,8 +33,12 @@ async def _websocket(
     # Se registra la conexión del websocket
     await ws_manager.connect(user_id, websocket)
 
+    # Intentar a menos que la conexión se termine...
     try:
+        # Ejecución mientras el websocket esté conectado
         while True:
             await websocket.receive_text()
+    # Si el websocket se desconecta...
     except WebSocketDisconnect:
-        await ws_manager.disconnect(user_id, websocket)
+        # Se remueve éste del administrador de websockets
+        await ws_manager.remove(user_id, websocket)
